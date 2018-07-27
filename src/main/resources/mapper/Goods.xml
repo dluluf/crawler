@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pinganfu.crawler.data.dao.GoodsDao">
+
+	<select id="queryGoodsById" resultType="GoodsDO">
+		SELECT *
+		FROM Goods
+		WHERE 
+		id= #{id} limit 1
+	</select>
+
+
+	<!-- 批量插入 -->
+	<insert id ="insertBatch" parameterType="java.util.List" >
+		<selectKey resultType ="java.lang.Integer" keyProperty= "id" order= "AFTER">
+			SELECT LAST_INSERT_ID()
+		</selectKey >
+
+		insert into Goods
+		(ID,goods_batch_No, goods_type, SHOP_NAME, GOODS_NAME, GOODS_SKU,GOODS_PRICE,GOODS_SALES,GOODS_COMMENT_COUNT,GOODS_DETAIL_URL)
+		values
+		<foreach collection ="list" item="goodsDO" index= "index" separator =",">
+			(
+            #{goodsDO.id},
+			#{goodsDO.goodsBatchNo},
+			#{goodsDO.goodsType},
+			#{goodsDO.shopName},
+			#{goodsDO.goodsName},
+			#{goodsDO.goodsSku},
+			#{goodsDO.goodsPrice},
+			#{goodsDO.goodsSales},
+			#{goodsDO.goodsCommentCount}
+			#{goodsDO.goodsDetailUrl}
+			)
+		</foreach >
+	</insert >
+
+</mapper>
