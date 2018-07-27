@@ -56,12 +56,6 @@ public class JDSearchPageJob implements Job {
         httpClientDownloader.setProxyProvider(new DefaultProxyProvider());
         spider.setDownloader(httpClientDownloader);
 
-//        System.setProperty("selenuim_config", "D:\\wuhao\\webmagic\\config.ini");
-//        SeleniumDownloader seleniumDownloader =
-//                new SeleniumDownloader("D:\\wuhao\\webmagic\\chromedriver.exe");
-//        spider.setDownloader(seleniumDownloader);
-
-
         //目标url模版
         String urlTemplate = (String)jobDataMap.get("urlTemplate");
         //目标url配置

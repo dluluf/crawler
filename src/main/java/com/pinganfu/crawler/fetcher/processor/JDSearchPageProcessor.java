@@ -12,6 +12,7 @@ import org.springframework.util.StringUtils;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.processor.PageProcessor;
+import us.codecraft.webmagic.utils.UrlUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +30,7 @@ public class JDSearchPageProcessor implements PageProcessor {
 
     private Site site;
 
-    private static FetchConfigInfo fetchConfigInfo ;
+    private static FetchConfigInfo fetchConfigInfo;
 
     private SnowflakeIdWorker snowflakeIdWorker;
 
@@ -38,15 +39,9 @@ public class JDSearchPageProcessor implements PageProcessor {
         snowflakeIdWorker = (SnowflakeIdWorker) SpringContextUtil.getBean("snowflakeIdWorker");
     }
 
-    private void parseFields(Document document,List<GoodsDO> goodsDOList){
-
+    private void parseFields(Page page, Document document,List<GoodsDO> goodsDOList){
         String contentListCssSelector = fetchConfigInfo.getContentListCssSelector();
-
         Map<String,String> fieldsCssSelectorMap = fetchConfigInfo.getFieldsCssSelector();
-
-
-
-
 
         if(contentListCssSelector != null && !"".equals(contentListCssSelector)){
             Elements contentList =  document.select(contentListCssSelector);
@@ -57,7 +52,10 @@ public class JDSearchPageProcessor implements PageProcessor {
 
                 String goodsDetailUrl = fieldsCssSelectorMap.get("goodsDetailUrl");
                 if(!StringUtils.isEmpty(goodsDetailUrl)){
-                    goodsDO.setGoodsDetailUrl(content.select(goodsDetailUrl).attr("abs:href"));
+                    String detailUrl = content.select(goodsDetailUrl).attr("abs:href");
+                    goodsDO.setGoodsDetailUrl(detailUrl);
+                    //这里是否需要爬取根据需求来定
+                    page.addTargetRequest(detailUrl);
                 }
                 String nameField = fieldsCssSelectorMap.get("goodsName");
                 if(!StringUtils.isEmpty(nameField)){
@@ -96,7 +94,13 @@ public class JDSearchPageProcessor implements PageProcessor {
     public void process(Page page) {
         Document document = page.getHtml().getDocument();
         List<GoodsDO> goodsDOList = new ArrayList<GoodsDO>();
-        parseFields(document, goodsDOList);
+        //根据请求的域名来解析不同的url页面
+        String domain = UrlUtils.getDomain(page.getRequest().getUrl());
+        if("search.jd.com".equals(domain)){
+            parseFields(page, document, goodsDOList);
+        }else if("item.jd.com".equals(domain)){
+            //TODO 解析第二级页面内容
+        }
         page.putField("data", goodsDOList);
     }
 
