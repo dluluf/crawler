@@ -29,7 +29,7 @@
 			#{goodsDO.goodsSku},
 			#{goodsDO.goodsPrice},
 			#{goodsDO.goodsSales},
-			#{goodsDO.goodsCommentCount}
+			#{goodsDO.goodsCommentCount},
 			#{goodsDO.goodsDetailUrl}
 			)
 		</foreach >
