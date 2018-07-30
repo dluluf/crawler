@@ -22,6 +22,7 @@ import us.codecraft.webmagic.proxy.SimpleProxyProvider;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -62,54 +63,89 @@ public class JDSearchPageJob implements Job {
         String pageParams = (String)jobDataMap.get("pageParams");
         //总页数
         int pageSize = (int)jobDataMap.get("pageSize");
-        targetUrlAdd(spider, urlTemplate, pageParams, pageSize);
+
+        Map<String,Integer> pageParamsMap = (Map<String,Integer>) JSON.parse(pageParams);
+
+        targetUrlAdd(spider, urlTemplate, pageParamsMap, pageSize);
 
         spider.addPipeline(new DataPipeline()).run();
     }
 
+    /**
+     * 获取京东搜索页面字符串的编码
+     * 默认为gbk
+     * @param urlTemplate
+     * @return
+     */
+    private String getEncodeOfTempUrl(String urlTemplate){
+        Pattern pattern = Pattern.compile("enc=(.*?)&", Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(urlTemplate);
+        if (matcher.find()) {
+            String encode = matcher.group(1);
+            if (Charset.isSupported(encode)) {
+               return encode;
+            }
+        }
+        return "utf-8";
 
-    private void targetUrlAdd(Spider spider, String urlTemplate, String pageParams, int pageSize){
+    }
+
+    /**
+     * 添加目标url
+     * @param spider
+     * @param urlTemplate 分页url模版
+     * @param pageParamsMap 分页url需要替换的参数
+     * @param pageSize 分页总页数
+     */
+    private void targetUrlAdd(Spider spider, String urlTemplate, Map<String,Integer> pageParamsMap, int pageSize){
         if(urlTemplate==null || "".equals(urlTemplate)){
             return;
         }
-        if(pageParams==null || "".equals(pageParams)){
+        if(pageParamsMap==null || pageParamsMap.isEmpty()){
             return;
         }
         try {
-            urlTemplate = URLDecoder.decode(urlTemplate,"utf-8");
+            urlTemplate = URLDecoder.decode(urlTemplate, getEncodeOfTempUrl(urlTemplate));
 
-            Map<String,Integer> pageParamsMap = (Map<String,Integer>) JSON.parse(pageParams);
-            Map<String,Integer> paramsMap = new HashMap<String,Integer>();
-
-            for(int pageNum=1;pageNum <=pageSize; pageNum++){
-
+            Map<String,Integer> targetParamsMap = new HashMap<String,Integer>();
+            for(int pageNum=1; pageNum <= pageSize; pageNum++){
                 Iterator<String> iterator = pageParamsMap.keySet().iterator();
-                StringBuffer stringBuffer = new StringBuffer();
                 while(iterator.hasNext()){
                     String key = iterator.next();
-                    paramsMap.put(key,pageParamsMap.get(key)*(pageNum-1)+1);
+                    targetParamsMap.put(key, pageParamsMap.get(key)*(pageNum-1)+1);
                 }
-                Pattern pattern = Pattern.compile("\\$\\{(.+?)\\}");
-                Matcher matcher = pattern.matcher(urlTemplate);
-                while(matcher.find()){
-                    String key = matcher.group(1);
-                    String value = null;
-                    if(paramsMap.get(key)!=null){
-                        value = paramsMap.get(key).toString();
-                    }
-                    if(value == null){
-                        value = "";
-                    }else{
-                        value = value.replaceAll("\\$", "\\\\\\$");
-                    }
-                    matcher.appendReplacement(stringBuffer, value);
-                }
-                matcher.appendTail(stringBuffer);
-
-                spider.addUrl(stringBuffer.toString());
+                spider.addUrl(pageParamsReplace(urlTemplate, targetParamsMap));
             }
         } catch (UnsupportedEncodingException e) {
             LOGGER.warn("错误的字符串编码");
         }
+    }
+
+    /**
+     * 分页链接参数替换
+     * 将模板中需要替换的参数替换成目标参数值
+     * @param urlTemplate 分页链接模版
+     * @param targetParamsMap 替换的参数内容
+     * @return
+     */
+    private String pageParamsReplace(String urlTemplate, Map<String,Integer> targetParamsMap){
+        StringBuffer stringBuffer = new StringBuffer();
+        Pattern pattern = Pattern.compile("\\$\\{(.+?)\\}");
+        Matcher matcher = pattern.matcher(urlTemplate);
+        while(matcher.find()){
+            String key = matcher.group(1);
+            String value = null;
+            if(targetParamsMap.get(key)!=null){
+                value = targetParamsMap.get(key).toString();
+            }
+            if(value == null){
+                value = "";
+            }else{
+                value = value.replaceAll("\\$", "\\\\\\$");
+            }
+            matcher.appendReplacement(stringBuffer, value);
+        }
+        matcher.appendTail(stringBuffer);
+        return stringBuffer.toString();
     }
 }
