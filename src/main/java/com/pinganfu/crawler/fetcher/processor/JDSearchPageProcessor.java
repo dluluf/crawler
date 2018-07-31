@@ -61,14 +61,15 @@ public class JDSearchPageProcessor implements PageProcessor {
                 if(!StringUtils.isEmpty(nameField)){
                     goodsDO.setGoodsName(content.select(nameField).text());
                 }
-                String goodPriceField = fieldsCssSelectorMap.get("goodPrice");
+                String goodPriceField = fieldsCssSelectorMap.get("goodsPrice");
                 if(!StringUtils.isEmpty(goodPriceField)){
                     goodsDO.setGoodsPrice(content.select(goodPriceField).text());
                 }
-                String goodTypeField = fieldsCssSelectorMap.get("goodType");
-                if(!StringUtils.isEmpty(goodTypeField)){
-                    goodsDO.setGoodsType(content.select(goodTypeField).text());
-                }
+                goodsDO.setGoodsType(fetchConfigInfo.getTaskName());
+//                String goodTypeField = fieldsCssSelectorMap.get("goodType");
+//                if(!StringUtils.isEmpty(goodTypeField)){
+//                    goodsDO.setGoodsType(content.select(goodTypeField).text());
+//                }
                 String commentField = fieldsCssSelectorMap.get("commentNum");
                 if(!StringUtils.isEmpty(commentField)){
                     goodsDO.setGoodsCommentCount(content.select(commentField).text());

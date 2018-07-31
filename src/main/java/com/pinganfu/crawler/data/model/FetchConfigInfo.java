@@ -8,6 +8,8 @@ public class FetchConfigInfo {
 
     private Map<String,String> fieldsCssSelector;
     private String taskId;
+    //任务名称即商品类型
+    private String taskName;
     private String batchNo;
     private int pageSize;
     private String urlTemplate;
@@ -69,5 +71,13 @@ public class FetchConfigInfo {
 
     public void setTaskId(String taskId) {
         this.taskId = taskId;
+    }
+
+    public String getTaskName() {
+        return taskName;
+    }
+
+    public void setTaskName(String taskName) {
+        this.taskName = taskName;
     }
 }

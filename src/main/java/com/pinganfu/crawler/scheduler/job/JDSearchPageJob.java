@@ -14,19 +14,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 import us.codecraft.webmagic.Spider;
 import us.codecraft.webmagic.downloader.HttpClientDownloader;
-import us.codecraft.webmagic.downloader.selenium.SeleniumDownloader;
-import us.codecraft.webmagic.processor.PageProcessor;
-import us.codecraft.webmagic.proxy.Proxy;
-import us.codecraft.webmagic.proxy.ProxyProvider;
-import us.codecraft.webmagic.proxy.SimpleProxyProvider;
+
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -44,11 +38,13 @@ public class JDSearchPageJob implements Job {
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         JobDataMap jobDataMap = jobExecutionContext.getJobDetail().getJobDataMap();
         String taskId = (String)jobDataMap.get("taskId");
+        String taskName = (String)jobDataMap.get("taskName");
         String contentListCssSelector = (String)jobDataMap.get("contentListCssSelector");
         Map fieldsCssSelectorMap = (Map)jobDataMap.get("fieldsCssSelector");
 
         FetchConfigInfo fetchConfigInfo = new FetchConfigInfo();
         fetchConfigInfo.setBatchNo(taskId+System.currentTimeMillis());
+        fetchConfigInfo.setTaskName(taskName);
         fetchConfigInfo.setContentListCssSelector(contentListCssSelector);
         fetchConfigInfo.setFieldsCssSelector(fieldsCssSelectorMap);
 

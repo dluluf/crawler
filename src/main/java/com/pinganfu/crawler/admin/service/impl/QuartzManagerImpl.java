@@ -33,6 +33,7 @@ public class QuartzManagerImpl implements QuartzManager {
 
         JobDataMap dataMap =new JobDataMap();
         dataMap.put("taskId",fetchConfigInfo.getTaskId());
+        dataMap.put("taskName",fetchConfigInfo.getTaskName());
         dataMap.put("pageSize",fetchConfigInfo.getPageSize());
         dataMap.put("contentListCssSelector",fetchConfigInfo.getContentListCssSelector());
         dataMap.put("fieldsCssSelector",fetchConfigInfo.getFieldsCssSelector());
@@ -40,8 +41,7 @@ public class QuartzManagerImpl implements QuartzManager {
         dataMap.put("pageParams",fetchConfigInfo.getPageParams());
 
 
-        JobDetail jobDetail =
-                JobBuilder.newJob(jobClass).withIdentity(jobName, jobGroupName).
+        JobDetail jobDetail = JobBuilder.newJob(jobClass).withIdentity(jobName, jobGroupName).
                         usingJobData(dataMap).build();
 
         TriggerBuilder<Trigger> triggerBuilder =   TriggerBuilder.newTrigger();

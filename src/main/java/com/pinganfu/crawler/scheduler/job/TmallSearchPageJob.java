@@ -3,20 +3,17 @@ package com.pinganfu.crawler.scheduler.job;
 import com.alibaba.fastjson.JSON;
 import com.pinganfu.crawler.data.model.FetchConfigInfo;
 import com.pinganfu.crawler.data.pipeline.DataPipeline;
-import com.pinganfu.crawler.fetcher.processor.JDSearchPageProcessor;
+import com.pinganfu.crawler.fetcher.download.SeleniumDownloader;
 import com.pinganfu.crawler.fetcher.processor.TianMaoSearchPageProcessor;
-import com.pinganfu.crawler.fetcher.proxy.DefaultProxyProvider;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import us.codecraft.webmagic.Spider;
-import us.codecraft.webmagic.downloader.HttpClientDownloader;
-import us.codecraft.webmagic.downloader.PhantomJSDownloader;
-import us.codecraft.webmagic.downloader.selenium.SeleniumDownloader;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -38,65 +35,14 @@ public class TmallSearchPageJob implements Job {
         fetchConfigInfo.setFieldsCssSelector(fieldsCssSelectorMap);
 
         Spider spider = Spider.create(new TianMaoSearchPageProcessor(fetchConfigInfo));
-        System.setProperty("selenuim_config", "D:\\wuhao\\webmagic\\config.ini");
         SeleniumDownloader seleniumDownloader =
-                new SeleniumDownloader("D:\\wuhao\\webmagic\\chromedriver.exe");
-//        spider.setDownloader(httpClientDownloader);
+                new SeleniumDownloader("C:\\Program Files (x86)\\Google\\Chrome\\Application\\chromedriver.exe");
+        spider.setDownloader(seleniumDownloader);
 
-        PhantomJSDownloader phantomJSDownloader = new PhantomJSDownloader("phantomjs.exe","D:\\wuhao\\webmagic\\crawl.js");
-        spider.setDownloader(phantomJSDownloader);
-        //目标url模版
-        String urlTemplate = (String)jobDataMap.get("urlTemplate");
-        //目标url配置
-        String pageParams = (String)jobDataMap.get("pageParams");
-        //总页数
-        int pageSize = (int)jobDataMap.get("pageSize");
-        targetUrlAdd(spider, urlTemplate, pageParams, pageSize);
+        spider.addUrl("https://search.jd.com/Search?keyword=%E5%9B%BE%E4%B9%A6&enc=utf-8&suggest=1.def.0.V17&wq=tushu&pvid=a2b6ae1c101440f4bb815bc650e951f3");
+
+
 
         spider.addPipeline(new DataPipeline()).run();
-    }
-
-
-    private void targetUrlAdd(Spider spider, String urlTemplate, String pageParams, int pageSize){
-        if(urlTemplate==null || "".equals(urlTemplate)){
-            return;
-        }
-        if(pageParams==null || "".equals(pageParams)){
-            return;
-        }
-        try {
-            urlTemplate = URLDecoder.decode(urlTemplate,"gbk");
-
-            Map<String,Integer> pageParamsMap = (Map<String,Integer>) JSON.parse(pageParams);
-            Map<String,Integer> paramsMap = new HashMap<String,Integer>();
-
-            for(int pageNum=1;pageNum <=pageSize; pageNum++){
-                Iterator<String> iterator = pageParamsMap.keySet().iterator();
-                StringBuffer stringBuffer = new StringBuffer();
-                while(iterator.hasNext()){
-                    String key = iterator.next();
-                    paramsMap.put(key,pageParamsMap.get(key)*pageNum);
-                }
-                Pattern pattern = Pattern.compile("\\$\\{(.+?)\\}");
-                Matcher matcher = pattern.matcher(urlTemplate);
-                while(matcher.find()){
-                    String key = matcher.group(1);
-                    String value = null;
-                    if(paramsMap.get(key)!=null){
-                        value = paramsMap.get(key).toString();
-                    }
-                    if(value == null){
-                        value = "";
-                    }else{
-                        value = value.replaceAll("\\$", "\\\\\\$");
-                    }
-                    matcher.appendReplacement(stringBuffer, value);
-                }
-                matcher.appendTail(stringBuffer);
-
-                spider.addUrl(stringBuffer.toString());
-            }
-        } catch (UnsupportedEncodingException e) {
-        }
     }
 }

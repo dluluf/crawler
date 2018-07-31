@@ -72,7 +72,8 @@ public class TaskController {
         fetchConfigInfo.setPageSize(Integer.valueOf(taskConfigDO.getPageSize()));
 
         fetchConfigInfo.setFieldsCssSelector((Map)JSON.parse(taskConfigDO.getFieldsCssSelector()));
-        fetchConfigInfo.setTaskId(jobInfo.getJobId());
+        fetchConfigInfo.setTaskId(taskConfigDO.getId());
+        fetchConfigInfo.setTaskName(taskConfigDO.getTaskName());
         fetchConfigInfo.setPageParams(taskConfigDO.getPageParams());
         fetchConfigInfo.setUrlTemplate(taskConfigDO.getUrlTemplate());
 
