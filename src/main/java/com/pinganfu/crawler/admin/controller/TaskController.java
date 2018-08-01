@@ -58,8 +58,8 @@ public class TaskController {
         taskConfigBO.setCron(taskConfigDO.getCron());
         taskConfigBO.setSeedUrl(taskConfigDO.getSeedUrl());
 
-        taskConfigBO.setJobClass("com.pinganfu.crawler.scheduler.job.TmallSearchPageJob");
-//        taskConfigBO.setJobClass("com.pinganfu.crawler.scheduler.job.JDSearchPageJob");
+        taskConfigBO.setJobClass("com.pinganfu.crawler.scheduler.job.JDSearchListPageJob");
+//        taskConfigBO.setJobClass("com.pinganfu.crawler.scheduler.job.NoLoginUrlTempSearchListJob");
         try {
             quartzManager.startJob(taskConfigBO);
         } catch (ClassNotFoundException e) {

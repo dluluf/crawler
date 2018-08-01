@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
  * 没有给downloader设置代理 等一系列反扒设置
  * TODO 代理ip,userAgent
  */
-public class JDSearchPageJob implements Job {
+public class NoLoginUrlTempSearchListJob implements Job {
 
     private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 

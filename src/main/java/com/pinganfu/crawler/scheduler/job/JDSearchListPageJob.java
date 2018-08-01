@@ -11,7 +11,7 @@ import org.quartz.JobExecutionException;
 import us.codecraft.webmagic.Spider;
 
 
-public class TmallSearchPageJob implements Job {
+public class JDSearchListPageJob implements Job {
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         JobDataMap jobDataMap = jobExecutionContext.getJobDetail().getJobDataMap();
@@ -23,6 +23,7 @@ public class TmallSearchPageJob implements Job {
                 new SeleniumDownloader("C:\\Program Files (x86)\\Google\\Chrome\\Application\\chromedriver.exe");
         spider.setDownloader(seleniumDownloader);
         spider.addUrl(taskConfigBO.getSeedUrl());
+//        spider.thread(3);
         spider.addPipeline(new DataPipeline()).run();
     }
 }

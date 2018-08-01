@@ -43,6 +43,7 @@ public class ListSearchPageProcessor implements PageProcessor {
                 GoodsDO goodsDO = new GoodsDO();
                 goodsDO.setId(String.valueOf(snowflakeIdWorker.nextId()));
                 goodsDO.setGoodsBatchNo(taskConfigBO.getBatchNo());
+                goodsDO.setGoodsType(taskConfigBO.getTaskName());
 
                 String goodsDetailUrl = fieldsCssSelectorMap.get("goodsDetailUrl");
                 if(!StringUtils.isEmpty(goodsDetailUrl)){
@@ -59,7 +60,7 @@ public class ListSearchPageProcessor implements PageProcessor {
                 if(!StringUtils.isEmpty(goodPriceField)){
                     goodsDO.setGoodsPrice(content.select(goodPriceField).text());
                 }
-                goodsDO.setGoodsType(taskConfigBO.getTaskName());
+
 
                 String commentField = fieldsCssSelectorMap.get("commentNum");
                 if(!StringUtils.isEmpty(commentField)){
