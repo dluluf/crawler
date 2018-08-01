@@ -1,7 +1,7 @@
 package com.pinganfu.crawler.scheduler.job;
 
 import com.alibaba.fastjson.JSON;
-import com.pinganfu.crawler.data.model.FetchConfigInfo;
+import com.pinganfu.crawler.data.model.TaskConfigBO;
 import com.pinganfu.crawler.data.pipeline.DataPipeline;
 import com.pinganfu.crawler.fetcher.processor.JDSearchPageProcessor;
 import com.pinganfu.crawler.fetcher.proxy.DefaultProxyProvider;
@@ -11,7 +11,6 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.Assert;
 import us.codecraft.webmagic.Spider;
 import us.codecraft.webmagic.downloader.HttpClientDownloader;
 
@@ -42,13 +41,13 @@ public class JDSearchPageJob implements Job {
         String contentListCssSelector = (String)jobDataMap.get("contentListCssSelector");
         Map fieldsCssSelectorMap = (Map)jobDataMap.get("fieldsCssSelector");
 
-        FetchConfigInfo fetchConfigInfo = new FetchConfigInfo();
-        fetchConfigInfo.setBatchNo(taskId+System.currentTimeMillis());
-        fetchConfigInfo.setTaskName(taskName);
-        fetchConfigInfo.setContentListCssSelector(contentListCssSelector);
-        fetchConfigInfo.setFieldsCssSelector(fieldsCssSelectorMap);
+        TaskConfigBO taskConfigBO = new TaskConfigBO();
+        taskConfigBO.setBatchNo(taskId+System.currentTimeMillis());
+        taskConfigBO.setTaskName(taskName);
+        taskConfigBO.setContentListCssSelector(contentListCssSelector);
+        taskConfigBO.setFieldsCssSelector(fieldsCssSelectorMap);
 
-        Spider spider = Spider.create(new JDSearchPageProcessor(fetchConfigInfo));
+        Spider spider = Spider.create(new JDSearchPageProcessor(taskConfigBO));
 
         HttpClientDownloader httpClientDownloader = new HttpClientDownloader();
         httpClientDownloader.setProxyProvider(new DefaultProxyProvider());

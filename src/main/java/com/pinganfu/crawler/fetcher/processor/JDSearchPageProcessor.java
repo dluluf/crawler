@@ -1,6 +1,6 @@
 package com.pinganfu.crawler.fetcher.processor;
 
-import com.pinganfu.crawler.data.model.FetchConfigInfo;
+import com.pinganfu.crawler.data.model.TaskConfigBO;
 import com.pinganfu.crawler.data.model.GoodsDO;
 import com.pinganfu.crawler.fetcher.userAgent.DefaultUserAgentProvider;
 import com.pinganfu.crawler.util.SnowflakeIdWorker;
@@ -30,25 +30,25 @@ public class JDSearchPageProcessor implements PageProcessor {
 
     private Site site;
 
-    private static FetchConfigInfo fetchConfigInfo;
+    private static TaskConfigBO taskConfigBO;
 
     private SnowflakeIdWorker snowflakeIdWorker;
 
-    public JDSearchPageProcessor(FetchConfigInfo fetchConfigInfo){
-        this.fetchConfigInfo = fetchConfigInfo;
+    public JDSearchPageProcessor(TaskConfigBO taskConfigBO){
+        this.taskConfigBO = taskConfigBO;
         snowflakeIdWorker = (SnowflakeIdWorker) SpringContextUtil.getBean("snowflakeIdWorker");
     }
 
     private void parseFields(Page page, Document document,List<GoodsDO> goodsDOList){
-        String contentListCssSelector = fetchConfigInfo.getContentListCssSelector();
-        Map<String,String> fieldsCssSelectorMap = fetchConfigInfo.getFieldsCssSelector();
+        String contentListCssSelector = taskConfigBO.getContentListCssSelector();
+        Map<String,String> fieldsCssSelectorMap = taskConfigBO.getFieldsCssSelector();
 
         if(contentListCssSelector != null && !"".equals(contentListCssSelector)){
             Elements contentList =  document.select(contentListCssSelector);
             for(Element content : contentList){
                 GoodsDO goodsDO = new GoodsDO();
                 goodsDO.setId(String.valueOf(snowflakeIdWorker.nextId()));
-                goodsDO.setGoodsBatchNo(fetchConfigInfo.getBatchNo());
+                goodsDO.setGoodsBatchNo(taskConfigBO.getBatchNo());
 
                 String goodsDetailUrl = fieldsCssSelectorMap.get("goodsDetailUrl");
                 if(!StringUtils.isEmpty(goodsDetailUrl)){
@@ -65,7 +65,7 @@ public class JDSearchPageProcessor implements PageProcessor {
                 if(!StringUtils.isEmpty(goodPriceField)){
                     goodsDO.setGoodsPrice(content.select(goodPriceField).text());
                 }
-                goodsDO.setGoodsType(fetchConfigInfo.getTaskName());
+                goodsDO.setGoodsType(taskConfigBO.getTaskName());
 //                String goodTypeField = fieldsCssSelectorMap.get("goodType");
 //                if(!StringUtils.isEmpty(goodTypeField)){
 //                    goodsDO.setGoodsType(content.select(goodTypeField).text());

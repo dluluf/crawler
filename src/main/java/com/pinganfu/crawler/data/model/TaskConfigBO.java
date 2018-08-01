@@ -2,7 +2,13 @@ package com.pinganfu.crawler.data.model;
 
 import java.util.Map;
 
-public class FetchConfigInfo {
+public class TaskConfigBO {
+    /**
+     * 处理job的类
+     */
+    private String jobClass;
+    private String cron;
+    private String seedUrl;
 
     private String contentListCssSelector;
 
@@ -15,6 +21,29 @@ public class FetchConfigInfo {
     private String urlTemplate;
     private String pageParams;
 
+    public String getSeedUrl() {
+        return seedUrl;
+    }
+
+    public void setSeedUrl(String seedUrl) {
+        this.seedUrl = seedUrl;
+    }
+
+    public String getCron() {
+        return cron;
+    }
+
+    public void setCron(String cron) {
+        this.cron = cron;
+    }
+
+    public String getJobClass() {
+        return jobClass;
+    }
+
+    public void setJobClass(String jobClass) {
+        this.jobClass = jobClass;
+    }
 
     public String getContentListCssSelector() {
         return contentListCssSelector;

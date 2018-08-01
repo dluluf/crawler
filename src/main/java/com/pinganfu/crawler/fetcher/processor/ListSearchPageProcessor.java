@@ -1,6 +1,6 @@
 package com.pinganfu.crawler.fetcher.processor;
 
-import com.pinganfu.crawler.data.model.FetchConfigInfo;
+import com.pinganfu.crawler.data.model.TaskConfigBO;
 import com.pinganfu.crawler.data.model.GoodsDO;
 import com.pinganfu.crawler.fetcher.userAgent.DefaultUserAgentProvider;
 import com.pinganfu.crawler.util.SnowflakeIdWorker;
@@ -8,7 +8,6 @@ import com.pinganfu.crawler.util.SpringContextUtil;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.openqa.selenium.Cookie;
 import org.springframework.util.StringUtils;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Site;
@@ -19,28 +18,31 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class TianMaoSearchPageProcessor implements PageProcessor {
+/**
+ * 京东搜索列表页字段获取处理类
+ */
+public class ListSearchPageProcessor implements PageProcessor {
     private Site site;
 
-    private static FetchConfigInfo fetchConfigInfo;
+    private static TaskConfigBO taskConfigBO;
 
     private SnowflakeIdWorker snowflakeIdWorker;
 
-    public TianMaoSearchPageProcessor(FetchConfigInfo fetchConfigInfo){
-        this.fetchConfigInfo = fetchConfigInfo;
+    public ListSearchPageProcessor(TaskConfigBO taskConfigBO){
+        this.taskConfigBO = taskConfigBO;
         snowflakeIdWorker = (SnowflakeIdWorker) SpringContextUtil.getBean("snowflakeIdWorker");
     }
 
     private void parseFields(Page page, Document document,List<GoodsDO> goodsDOList){
-        String contentListCssSelector = fetchConfigInfo.getContentListCssSelector();
-        Map<String,String> fieldsCssSelectorMap = fetchConfigInfo.getFieldsCssSelector();
+        String contentListCssSelector = taskConfigBO.getContentListCssSelector();
+        Map<String,String> fieldsCssSelectorMap = taskConfigBO.getFieldsCssSelector();
 
         if(contentListCssSelector != null && !"".equals(contentListCssSelector)){
             Elements contentList =  document.select(contentListCssSelector);
             for(Element content : contentList){
                 GoodsDO goodsDO = new GoodsDO();
                 goodsDO.setId(String.valueOf(snowflakeIdWorker.nextId()));
-                goodsDO.setGoodsBatchNo(fetchConfigInfo.getBatchNo());
+                goodsDO.setGoodsBatchNo(taskConfigBO.getBatchNo());
 
                 String goodsDetailUrl = fieldsCssSelectorMap.get("goodsDetailUrl");
                 if(!StringUtils.isEmpty(goodsDetailUrl)){
@@ -57,7 +59,7 @@ public class TianMaoSearchPageProcessor implements PageProcessor {
                 if(!StringUtils.isEmpty(goodPriceField)){
                     goodsDO.setGoodsPrice(content.select(goodPriceField).text());
                 }
-                goodsDO.setGoodsType(fetchConfigInfo.getTaskName());
+                goodsDO.setGoodsType(taskConfigBO.getTaskName());
 
                 String commentField = fieldsCssSelectorMap.get("commentNum");
                 if(!StringUtils.isEmpty(commentField)){

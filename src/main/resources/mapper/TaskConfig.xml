@@ -5,6 +5,7 @@
     <resultMap id="taskConfig" type="com.pinganfu.crawler.data.model.TaskConfigDO">
         <id column="ID" property="id" />
         <result column="TASK_NAME" property="taskName" />
+        <result column="JOB_CLASS" property="jobClass" />
         <result column="SEED_URL" property="seedUrl" />
         <result column="CRON" property="cron" />
         <result column="URL_CSS_SELECTOR" property="urlCssSelector" />
@@ -31,12 +32,13 @@
     <!-- 批量插入 -->
     <insert id ="addTaskConfig" >
         insert into TASK_CONFIG
-        (ID,TASK_NAME, SEED_URL, CRON, URL_CSS_SELECTOR,
+        (ID,TASK_NAME, JOB_CLASS, SEED_URL, CRON, URL_CSS_SELECTOR,
         FIELDS_CSS_SELECTOR,CONTENT_LIST_CSS_SELECTOR,PAGE_SIZE,PAGE_PARAMS,URL_TEMPLATE)
         values
             (
             #{id},
             #{taskName},
+            #{jobClass},
             #{seedUrl},
             #{cron},
             #{urlCssSelector},

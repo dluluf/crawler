@@ -10,6 +10,8 @@ public class TaskConfigDO {
      * 任务名称
      */
     private String taskName;
+
+    private String jobClass;
     /**
      * 链接入库url
      */
@@ -124,5 +126,13 @@ public class TaskConfigDO {
 
     public void setUrlTemplate(String urlTemplate) {
         this.urlTemplate = urlTemplate;
+    }
+
+    public String getJobClass() {
+        return jobClass;
+    }
+
+    public void setJobClass(String jobClass) {
+        this.jobClass = jobClass;
     }
 }

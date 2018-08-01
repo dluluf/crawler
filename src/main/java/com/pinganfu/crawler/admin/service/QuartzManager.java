@@ -1,8 +1,7 @@
 package com.pinganfu.crawler.admin.service;
 
-import com.pinganfu.crawler.data.model.FetchConfigInfo;
-import com.pinganfu.crawler.data.model.JobInfo;
+import com.pinganfu.crawler.data.model.TaskConfigBO;
 
 public interface QuartzManager {
-    void startJob(JobInfo jobInfo, FetchConfigInfo fetchConfigInfo) throws ClassNotFoundException;
+    void startJob(TaskConfigBO taskConfigBO) throws ClassNotFoundException;
 }
