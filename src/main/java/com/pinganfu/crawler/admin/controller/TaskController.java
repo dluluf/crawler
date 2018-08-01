@@ -58,8 +58,8 @@ public class TaskController {
         TaskConfigDO taskConfigDO = taskService.getTaskById(id);
 
         JobInfo jobInfo = new JobInfo();
-        jobInfo.setJobClass("com.pinganfu.crawler.scheduler.job.JDSearchPageJob");
-//        jobInfo.setJobClass("com.pinganfu.crawler.scheduler.job.TmallSearchPageJob");
+//        jobInfo.setJobClass("com.pinganfu.crawler.scheduler.job.JDSearchPageJob");
+        jobInfo.setJobClass("com.pinganfu.crawler.scheduler.job.TmallSearchPageJob");
         jobInfo.setJobGroupName(taskConfigDO.getTaskName());
         jobInfo.setJobName(taskConfigDO.getTaskName());
         jobInfo.setTriggerName(taskConfigDO.getTaskName());

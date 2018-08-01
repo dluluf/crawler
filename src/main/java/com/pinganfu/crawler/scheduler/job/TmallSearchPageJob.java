@@ -1,6 +1,5 @@
 package com.pinganfu.crawler.scheduler.job;
 
-import com.alibaba.fastjson.JSON;
 import com.pinganfu.crawler.data.model.FetchConfigInfo;
 import com.pinganfu.crawler.data.pipeline.DataPipeline;
 import com.pinganfu.crawler.fetcher.download.SeleniumDownloader;
@@ -11,14 +10,7 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import us.codecraft.webmagic.Spider;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.nio.charset.Charset;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class TmallSearchPageJob implements Job {
     @Override
@@ -39,7 +31,8 @@ public class TmallSearchPageJob implements Job {
                 new SeleniumDownloader("C:\\Program Files (x86)\\Google\\Chrome\\Application\\chromedriver.exe");
         spider.setDownloader(seleniumDownloader);
 
-        spider.addUrl("https://search.jd.com/Search?keyword=%E5%9B%BE%E4%B9%A6&enc=utf-8&suggest=1.def.0.V17&wq=tushu&pvid=a2b6ae1c101440f4bb815bc650e951f3");
+//        spider.addUrl("https://search.jd.com/Search?keyword=%E5%9B%BE%E4%B9%A6&enc=utf-8&suggest=1.def.0.V17&wq=tushu&pvid=a2b6ae1c101440f4bb815bc650e951f3");
+        spider.addUrl("https://search.jd.com/Search?keyword=%E7%94%B5%E5%99%A8&enc=utf-8&qrst=1&rt=1&stop=1&vt=2&suggest=1.def.0.V17&wq=dianqi&stock=1&page=197&s=5878&click=0");
 
 
 

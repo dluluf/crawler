@@ -6,7 +6,7 @@ import org.openqa.selenium.Cookie;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
+
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Request;
 import us.codecraft.webmagic.Site;
@@ -14,35 +14,36 @@ import us.codecraft.webmagic.Task;
 import us.codecraft.webmagic.downloader.Downloader;
 import us.codecraft.webmagic.selector.PlainText;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.Map;
 
-public class SeleniumDownloader implements Downloader{
+public class SeleniumDownloader implements Downloader,Closeable{
+    private Logger logger = Logger.getLogger(this.getClass());
+    private volatile WebDriverPool webDriverPool;
+    private int defaultPoolSize = 1;
 
-
-    private Logger logger = Logger.getLogger(getClass());
-
-    private static WebDriver webDriver;
 
     public SeleniumDownloader(String chromeDriverPath) {
-        System.getProperties().setProperty("webdriver.chrome.driver",
-                chromeDriverPath);
-        webDriver = new ChromeDriver();
+        System.getProperties().setProperty("webdriver.chrome.driver", chromeDriverPath);
+        if (webDriverPool == null) {
+            synchronized (this) {
+                webDriverPool = new WebDriverPool(defaultPoolSize);
+            }
+        }
     }
 
 
     public Page download(Request request, Task task) {
-
+        WebDriver webDriver = null;
         Page page = new Page();
-        try{
+        String javascript = "window.scrollBy(0,6000)";
 
-            webDriver.manage().window().maximize();
-            webDriver.get(request.getUrl());
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+        try {
+            webDriver = webDriverPool.get();
             WebDriver.Options manage = webDriver.manage();
+            manage.window().maximize();
+
             Site site = task.getSite();
             if (site.getCookies() != null) {
                 for (Map.Entry<String, String> cookieEntry : site.getCookies()
@@ -52,53 +53,54 @@ public class SeleniumDownloader implements Downloader{
                     manage.addCookie(cookie);
                 }
             }
+            webDriver.get(request.getUrl());
             JavascriptExecutor jsExecutor=(JavascriptExecutor) webDriver;
-            jsExecutor.executeScript("window.scrollBy(0,7000)");
-            try {
-                Thread.sleep(3000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
+            jsExecutor.executeScript(javascript);
+            Thread.sleep(1000);
             WebElement webElement = webDriver.findElement(By.xpath("/html"));
             String content = webElement.getAttribute("outerHTML");
             page.setRawText(content);
             page.setUrl(new PlainText(request.getUrl()));
             page.setRequest(request);
-            try{
-                WebElement lastNext = webDriver.findElement(By.cssSelector(".pn-next.disable"));
+
+           /* try{
+                WebElement lastNext = webDriver.findElement(By.cssSelector(".pn-next.disabled"));
                 if(lastNext != null){
-                    webDriver.quit();
-                    return page;
+                    logger.info("this page is the last of the search list...");
+                    //webDriver.quit();
+                    //return page;
                 }
             }catch (org.openqa.selenium.NoSuchElementException e){
+                logger.info("NO ELEMENT WITH CSS SELECTOR:.pn-next.disabled");
+            }*/
 
-            }
             WebElement element = webDriver.findElement(By.cssSelector(".pn-next"));
             if(element !=null){
                 element.click();
-                try {
-                    Thread.sleep(3000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
                 String url  = webDriver.getCurrentUrl();
-                System.out.println(url);
                 page.addTargetRequest(new Request(url));
             }
+
+        }catch (InterruptedException e) {
+            e.printStackTrace();
+            logger.warn("interrupted", e);
         }catch (Exception e){
-            webDriver.quit();
+            e.printStackTrace();
+            logger.warn("download error...", e);
         }
+        webDriverPool.returnToPool(webDriver);
         return page;
 
     }
 
     @Override
     public void setThread(int threadNum) {
-
+        this.defaultPoolSize = threadNum;
     }
 
 
-
-
+    @Override
+    public void close() throws IOException {
+        webDriverPool.closeAll();
+    }
 }

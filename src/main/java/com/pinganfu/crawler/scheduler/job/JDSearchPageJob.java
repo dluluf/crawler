@@ -49,6 +49,7 @@ public class JDSearchPageJob implements Job {
         fetchConfigInfo.setFieldsCssSelector(fieldsCssSelectorMap);
 
         Spider spider = Spider.create(new JDSearchPageProcessor(fetchConfigInfo));
+
         HttpClientDownloader httpClientDownloader = new HttpClientDownloader();
         httpClientDownloader.setProxyProvider(new DefaultProxyProvider());
         spider.setDownloader(httpClientDownloader);
