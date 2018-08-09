@@ -27,6 +27,7 @@ public class DataPipeline implements Pipeline {
         List<GoodsDO> list = resultItems.get("data");
         if(list != null && !list.isEmpty()){
             goodsService.saveGoodsBatch(list);
+            LOGGER.info("goods数据入库"+list.size());
         }
     }
 }

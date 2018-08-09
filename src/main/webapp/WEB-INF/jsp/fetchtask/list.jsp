@@ -13,12 +13,11 @@
         <th>任务名称</th>
         <th>时间表达式</th>
     </tr>
-    <c:forEach items="${taskList}" var="taskConfig">
+    <c:forEach items="${taskList}" var="taskDO">
         <tr>
-            <td><input type="text" name="taskId" value="${taskConfig.id}" hidden></td>
-            <td>${taskConfig.taskName}</td>
-            <td>${taskConfig.cron}</td>
-            <td><button  onclick="taskStart('${taskConfig.id}');" >启动</button> </td>
+            <td><input type="text" name="taskId" value="${taskDO.id}" hidden></td>
+            <td>${taskDO.taskName}</td>
+            <td><button  onclick="taskStart('${taskDO.id}');" >启动</button> </td>
             <td><button  onclick="" >删除</button> </td>
         </tr>
     </c:forEach>
@@ -29,7 +28,7 @@
         // var id =$("input[name='taskId']").val();
         var data = {id:id};
         $.ajax({
-            url: '../../task/start',
+            url: '../../fetchTask/start',
             type: 'POST',
             data:data,
             error:function (data) {

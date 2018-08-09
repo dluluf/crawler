@@ -1,10 +1,9 @@
 package com.pinganfu.crawler.admin.service.impl;
 
 import com.pinganfu.crawler.admin.service.QuartzManager;
-import com.pinganfu.crawler.data.model.TaskConfigBO;
+import com.pinganfu.crawler.data.model.TaskBO;
 import org.quartz.CronScheduleBuilder;
 import org.quartz.JobBuilder;
-import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
@@ -14,44 +13,28 @@ import org.quartz.TriggerBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.Map;
 
 @Service("quartzManager")
 public class QuartzManagerImpl implements QuartzManager {
+    private final static String JOB_NAME = "com.pinganfu.crawler.scheduler.job.SearchListPageJob";
     @Autowired
     private Scheduler scheduler;
 
-    public void startJob(TaskConfigBO taskConfigBO) throws ClassNotFoundException{
+    public void startJob(TaskBO taskBO) throws ClassNotFoundException{
 
-
-        Class jobClass = Class.forName(taskConfigBO.getJobClass());
-
-        JobDataMap dataMap =new JobDataMap();
-        Map<String,TaskConfigBO> taskConfigInfo = new HashMap<String,TaskConfigBO>();
-        taskConfigInfo.put("taskConfigInfo",taskConfigBO);
-        dataMap.putAll(taskConfigInfo);
-//        dataMap.put("taskId", taskConfigBO.getTaskId());
-//        dataMap.put("taskName", taskConfigBO.getTaskName());
-//        dataMap.put("pageSize", taskConfigBO.getPageSize());
-//        dataMap.put("contentListCssSelector", taskConfigBO.getContentListCssSelector());
-//        dataMap.put("fieldsCssSelector", taskConfigBO.getFieldsCssSelector());
-//        dataMap.put("urlTemplate", taskConfigBO.getUrlTemplate());
-//        dataMap.put("pageParams", taskConfigBO.getPageParams());
-
-
+        Class jobClass = Class.forName(JOB_NAME);
         JobDetail jobDetail = JobBuilder.newJob(jobClass).
-                withIdentity(taskConfigBO.getTaskName(), taskConfigBO.getTaskName()).usingJobData(dataMap).build();
+                withIdentity(taskBO.getTaskName(), taskBO.getTaskName()).build();
 
         TriggerBuilder<Trigger> triggerBuilder =   TriggerBuilder.newTrigger();
-        triggerBuilder.withIdentity(taskConfigBO.getTaskName(), taskConfigBO.getTaskName());
+        triggerBuilder.withIdentity(taskBO.getTaskName(), taskBO.getTaskName());
         triggerBuilder.startNow();
         Trigger trigger =null;
-        if(taskConfigBO.getCron()==null || "".equals(taskConfigBO.getCron())){
+        if(taskBO.getCron()==null || "".equals(taskBO.getCron())){
             triggerBuilder.withSchedule(SimpleScheduleBuilder.simpleSchedule());
             trigger = triggerBuilder.build();
         }else{
-            triggerBuilder.withSchedule(CronScheduleBuilder.cronSchedule(taskConfigBO.getCron()));
+            triggerBuilder.withSchedule(CronScheduleBuilder.cronSchedule(taskBO.getCron()));
             trigger = triggerBuilder.build();
         }
         try {

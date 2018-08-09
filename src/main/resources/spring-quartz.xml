@@ -16,8 +16,6 @@
 					    http://www.springframework.org/schema/util/spring-util.xsd
 					        http://www.springframework.org/schema/task
     http://www.springframework.org/schema/task/spring-task-3.1.xsd">
-
-
     <bean id="scheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
     </bean>
 

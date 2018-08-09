@@ -3,6 +3,9 @@ package com.pinganfu.crawler.fetcher.download;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.remote.DesiredCapabilities;
+
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -51,9 +54,14 @@ class WebDriverPool {
 		if (webDriverList.size() < capacity) {
 			synchronized (webDriverList) {
 				if (webDriverList.size() < capacity) {
-					ChromeDriver chromeDriver = new ChromeDriver();
-					innerQueue.add(chromeDriver);
-					webDriverList.add(chromeDriver);
+					ChromeOptions chromeOptions = new ChromeOptions();
+//					chromeOptions.addArguments("--headless");
+					chromeOptions.setHeadless(true);
+					ChromeDriver webDriver = new ChromeDriver(chromeOptions);
+
+
+					innerQueue.add(webDriver);
+					webDriverList.add(webDriver);
 				}
 			}
 		}

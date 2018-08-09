@@ -1,7 +1,10 @@
 package com.pinganfu.crawler.fetcher.processor;
 
-import com.pinganfu.crawler.data.model.TaskConfigBO;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.pinganfu.crawler.data.model.GoodsDO;
+import com.pinganfu.crawler.data.model.TaskBO;
+import com.pinganfu.crawler.data.model.UrlConfigDO;
 import com.pinganfu.crawler.fetcher.userAgent.DefaultUserAgentProvider;
 import com.pinganfu.crawler.util.SnowflakeIdWorker;
 import com.pinganfu.crawler.util.SpringContextUtil;
@@ -15,36 +18,29 @@ import us.codecraft.webmagic.processor.PageProcessor;
 import us.codecraft.webmagic.utils.UrlUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * 京东搜索列表页字段获取处理类
- */
-public class ListSearchPageProcessor implements PageProcessor {
+public class SearchListPageProcessor implements PageProcessor {
     private Site site;
-
-    private static TaskConfigBO taskConfigBO;
-
+    private UrlConfigDO urlConfigDO;
     private SnowflakeIdWorker snowflakeIdWorker;
-
-    public ListSearchPageProcessor(TaskConfigBO taskConfigBO){
-        this.taskConfigBO = taskConfigBO;
+    public SearchListPageProcessor(){
         snowflakeIdWorker = (SnowflakeIdWorker) SpringContextUtil.getBean("snowflakeIdWorker");
     }
 
-    private void parseFields(Page page, Document document,List<GoodsDO> goodsDOList){
-        String contentListCssSelector = taskConfigBO.getContentListCssSelector();
-        Map<String,String> fieldsCssSelectorMap = taskConfigBO.getFieldsCssSelector();
+
+    private void parseFields(Page page, Document document, List<GoodsDO> goodsDOList){
+        String contentListCssSelector = urlConfigDO.getContentListCssSelector();
+
+        Map<String,String> fieldsCssSelectorMap = (Map<String,String>)JSON.parse(urlConfigDO.getFieldsCssSelector());
 
         if(contentListCssSelector != null && !"".equals(contentListCssSelector)){
             Elements contentList =  document.select(contentListCssSelector);
             for(Element content : contentList){
                 GoodsDO goodsDO = new GoodsDO();
                 goodsDO.setId(String.valueOf(snowflakeIdWorker.nextId()));
-                goodsDO.setGoodsBatchNo(taskConfigBO.getBatchNo());
-                goodsDO.setGoodsType(taskConfigBO.getTaskName());
-
                 String goodsDetailUrl = fieldsCssSelectorMap.get("goodsDetailUrl");
                 if(!StringUtils.isEmpty(goodsDetailUrl)){
                     String detailUrl = content.select(goodsDetailUrl).attr("abs:href");
@@ -87,8 +83,12 @@ public class ListSearchPageProcessor implements PageProcessor {
     public void process(Page page) {
         Document document = page.getHtml().getDocument();
         List<GoodsDO> goodsDOList = new ArrayList<GoodsDO>();
-        //根据请求的域名来解析不同的url页面
+        //可能每个网页截取的内容字段不一样
+        //这里根据请求的域名来解析不同的url页面
         String domain = UrlUtils.getDomain(page.getRequest().getUrl());
+        if("list.tmall.com".equals(domain)){
+            parseFields(page, document, goodsDOList);
+        }
         if("search.jd.com".equals(domain)){
             parseFields(page, document, goodsDOList);
         }else if("item.jd.com".equals(domain)){
@@ -100,9 +100,17 @@ public class ListSearchPageProcessor implements PageProcessor {
 
     @Override
     public Site getSite() {
-        site = Site.me().setSleepTime(2000).setTimeOut(3000);
+        //TODO 超时设置 需要通过规则来配置
+        site = Site.me().setTimeOut(3000);
         site.setUserAgent(DefaultUserAgentProvider.getUserAgent());
         return site;
     }
 
+    public UrlConfigDO getUrlConfigDO() {
+        return urlConfigDO;
+    }
+
+    public void setUrlConfigDO(UrlConfigDO urlConfigDO) {
+        this.urlConfigDO = urlConfigDO;
+    }
 }
