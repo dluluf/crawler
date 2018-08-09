@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.pinganfu.crawler.data.dao.TaskDao" >
+  <resultMap id="BaseResultMap" type="com.pinganfu.crawler.data.model.TaskDO" >
+    <id column="ID" property="id" jdbcType="INTEGER" />
+    <result column="TASK_NAME" property="taskName" jdbcType="VARCHAR" />
+    <result column="SEED_URL" property="seedUrl" jdbcType="VARCHAR" />
+    <result column="URL_TEMPLATE" property="urlTemplate" jdbcType="VARCHAR" />
+    <result column="PAGE_PARAMS" property="pageParams" jdbcType="VARCHAR" />
+    <result column="STATUS" property="status" jdbcType="VARCHAR" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from task
+    where ID = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.pinganfu.crawler.data.model.TaskDO" >
+    insert into task (ID, TASK_NAME, SEED_URL, 
+      URL_TEMPLATE, PAGE_PARAMS, STATUS
+      )
+    values (#{id,jdbcType=INTEGER}, #{taskName,jdbcType=VARCHAR}, #{seedUrl,jdbcType=VARCHAR}, 
+      #{urlTemplate,jdbcType=VARCHAR}, #{pageParams,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.pinganfu.crawler.data.model.TaskDO" >
+    update task
+    set TASK_NAME = #{taskName,jdbcType=VARCHAR},
+      SEED_URL = #{seedUrl,jdbcType=VARCHAR},
+      URL_TEMPLATE = #{urlTemplate,jdbcType=VARCHAR},
+      PAGE_PARAMS = #{pageParams,jdbcType=VARCHAR},
+      STATUS = #{status,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select ID, TASK_NAME, SEED_URL, URL_TEMPLATE, PAGE_PARAMS, STATUS
+    from task
+    where ID = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select ID, TASK_NAME, SEED_URL, URL_TEMPLATE, PAGE_PARAMS, STATUS
+    from task
+  </select>
+</mapper>

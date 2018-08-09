@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.pinganfu.crawler.data.dao.ProxyIPDao" >
+  <resultMap id="BaseResultMap" type="com.pinganfu.crawler.data.model.ProxyIPDO" >
+    <id column="ID" property="id" jdbcType="INTEGER" />
+    <result column="HOST" property="host" jdbcType="VARCHAR" />
+    <result column="PORT" property="port" jdbcType="INTEGER" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from proxy_ip
+    where ID = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.pinganfu.crawler.data.model.ProxyIPDO" >
+    insert into proxy_ip (ID, HOST, PORT
+      )
+    values (#{id,jdbcType=INTEGER}, #{host,jdbcType=VARCHAR}, #{port,jdbcType=INTEGER}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.pinganfu.crawler.data.model.ProxyIPDO" >
+    update proxy_ip
+    set HOST = #{host,jdbcType=VARCHAR},
+      PORT = #{port,jdbcType=INTEGER}
+    where ID = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select ID, HOST, PORT
+    from proxy_ip
+    where ID = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select ID, HOST, PORT
+    from proxy_ip
+  </select>
+</mapper>

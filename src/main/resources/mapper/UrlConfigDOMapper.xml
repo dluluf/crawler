@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.pinganfu.crawler.data.dao.UrlConfigDao" >
+  <resultMap id="BaseResultMap" type="com.pinganfu.crawler.data.model.UrlConfigDO" >
+    <id column="ID" property="id" jdbcType="INTEGER" />
+    <id column="DOMAIN_URL" property="domainUrl" jdbcType="VARCHAR" />
+    <result column="FIELDS_CSS_SELECTOR" property="fieldsCssSelector" jdbcType="VARCHAR" />
+    <result column="CONTENT_LIST_CSS_SELECTOR" property="contentListCssSelector" jdbcType="VARCHAR" />
+    <result column="PAGE_COUNT_CSS_SELECTOR" property="pageCountCssSelector" jdbcType="VARCHAR" />
+    <result column="SLEEP_TIME" property="sleepTime" jdbcType="INTEGER" />
+    <result column="JAVASCRIPT" property="javascript" jdbcType="VARCHAR" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="map" >
+    delete from url_config
+    where ID = #{id,jdbcType=INTEGER}
+      and DOMAIN_URL = #{domainUrl,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.pinganfu.crawler.data.model.UrlConfigDO" >
+    insert into url_config (ID, DOMAIN_URL, FIELDS_CSS_SELECTOR, 
+      CONTENT_LIST_CSS_SELECTOR, PAGE_COUNT_CSS_SELECTOR, 
+      SLEEP_TIME, JAVASCRIPT)
+    values (#{id,jdbcType=INTEGER}, #{domainUrl,jdbcType=VARCHAR}, #{fieldsCssSelector,jdbcType=VARCHAR}, 
+      #{contentListCssSelector,jdbcType=VARCHAR}, #{pageCountCssSelector,jdbcType=VARCHAR}, 
+      #{sleepTime,jdbcType=INTEGER}, #{javascript,jdbcType=VARCHAR})
+  </insert>
+
+  <update id="updateByPrimaryKey" parameterType="com.pinganfu.crawler.data.model.UrlConfigDO" >
+    update url_config
+    set FIELDS_CSS_SELECTOR = #{fieldsCssSelector,jdbcType=VARCHAR},
+      CONTENT_LIST_CSS_SELECTOR = #{contentListCssSelector,jdbcType=VARCHAR},
+      PAGE_COUNT_CSS_SELECTOR = #{pageCountCssSelector,jdbcType=VARCHAR},
+      SLEEP_TIME = #{sleepTime,jdbcType=INTEGER},
+      JAVASCRIPT = #{javascript,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=INTEGER}
+      and DOMAIN_URL = #{domainUrl,jdbcType=VARCHAR}
+  </update>
+
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="map" >
+    select ID, DOMAIN_URL, FIELDS_CSS_SELECTOR, CONTENT_LIST_CSS_SELECTOR, PAGE_COUNT_CSS_SELECTOR, 
+    SLEEP_TIME, JAVASCRIPT
+    from url_config
+    where 1=1
+    <if test="id!=null and id!=''">
+      AND ID = #{id,jdbcType=INTEGER}
+    </if>
+    <if test="domainUrl!=null and domainUrl!=''">
+      and DOMAIN_URL = #{domainUrl,jdbcType=VARCHAR}
+    </if>
+
+  </select>
+
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select ID, DOMAIN_URL, FIELDS_CSS_SELECTOR, CONTENT_LIST_CSS_SELECTOR, PAGE_COUNT_CSS_SELECTOR, 
+    SLEEP_TIME, JAVASCRIPT
+    from url_config
+  </select>
+
+</mapper>
