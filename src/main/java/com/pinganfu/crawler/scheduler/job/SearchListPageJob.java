@@ -10,6 +10,7 @@ import com.pinganfu.crawler.fetcher.download.PageParamsDownloader;
 import com.pinganfu.crawler.fetcher.download.SeleniumDownloader;
 import com.pinganfu.crawler.fetcher.processor.PageParamsProcessor;
 import com.pinganfu.crawler.fetcher.processor.SearchListPageProcessor;
+import com.pinganfu.crawler.fetcher.proxy.DefaultProxyProvider;
 import com.pinganfu.crawler.util.SpringContextUtil;
 import org.jsoup.nodes.Document;
 import org.quartz.Job;
@@ -20,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Request;
 import us.codecraft.webmagic.Spider;
+import us.codecraft.webmagic.downloader.HttpClientDownloader;
 import us.codecraft.webmagic.utils.UrlUtils;
 
 import java.io.UnsupportedEncodingException;
@@ -147,6 +149,9 @@ public class SearchListPageJob implements Job {
         }else{
             pageSize = document.select(urlConfigDO.getPageCountCssSelector()).text();
         }
+        if(pageSize == null || "".equals(pageSize)){
+            pageSize = "0";
+        }
         LOGGER.info("抓取页面"+url+"的总页数为："+pageSize);
         return Integer.valueOf(pageSize);
     }
@@ -189,6 +194,10 @@ public class SearchListPageJob implements Job {
                 }
                 //使用默认下载器HttpClientDownloader
                 //TODO 可以配置请求头 代理ip
+                HttpClientDownloader httpClientDownloader = new HttpClientDownloader();
+                DefaultProxyProvider defaultProxyProvider = new DefaultProxyProvider();
+                httpClientDownloader.setProxyProvider(defaultProxyProvider);
+                spider.setDownloader(httpClientDownloader);
                 //需要模拟鼠标操作 使用模拟浏览器的downloader
                 if(js != null && !"".equals(js)){
                     spider.setDownloader(downloader);

@@ -31,4 +31,23 @@
     select ID, HOST, PORT
     from proxy_ip
   </select>
+
+
+  <!-- 批量插入 -->
+  <insert id ="insertBatch" parameterType="java.util.List" >
+    <selectKey resultType ="java.lang.Integer" keyProperty= "id" order= "AFTER">
+      SELECT LAST_INSERT_ID()
+    </selectKey >
+
+    insert into proxy_ip
+    (ID,HOST, PORT)
+    values
+    <foreach collection ="list" item="proxyIpDO" index= "index" separator =",">
+      (
+      #{proxyIpDO.id},
+      #{proxyIpDO.host},
+      #{proxyIpDO.port}
+      )
+    </foreach >
+  </insert >
 </mapper>

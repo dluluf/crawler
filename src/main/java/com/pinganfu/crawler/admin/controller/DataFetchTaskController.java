@@ -67,4 +67,19 @@ public class DataFetchTaskController {
         }
         return "success";
     }
+
+    @RequestMapping(value="/xici")
+    @ResponseBody
+    public String xici(Model model, String id){
+        TaskBO taskBO = new TaskBO();
+        taskBO.setTaskName("xici");
+
+        try {
+            quartzManager.startJob2(taskBO);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+
+        }
+        return "success";
+    }
 }

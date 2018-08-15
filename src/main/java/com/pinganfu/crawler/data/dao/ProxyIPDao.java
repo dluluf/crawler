@@ -13,4 +13,5 @@ public interface ProxyIPDao {
     List<ProxyIPDO> selectAll();
 
     int updateByPrimaryKey(ProxyIPDO record);
+    void insertBatch(List<ProxyIPDO> list);
 }

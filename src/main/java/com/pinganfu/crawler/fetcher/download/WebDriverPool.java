@@ -1,9 +1,13 @@
 package com.pinganfu.crawler.fetcher.download;
 
+import com.pinganfu.crawler.data.model.ProxyIPDO;
+import com.pinganfu.crawler.fetcher.proxy.DefaultProxyProvider;
 import org.apache.log4j.Logger;
+import org.openqa.selenium.Proxy;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 
@@ -13,6 +17,8 @@ import java.util.List;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static org.springframework.aop.framework.ProxyFactory.getProxy;
 
 class WebDriverPool {
 	private Logger logger = Logger.getLogger(getClass());
@@ -44,12 +50,29 @@ class WebDriverPool {
 		this.capacity = capacity;
 	}
 
-
+	private static DefaultProxyProvider defaultProxyProvider = new DefaultProxyProvider();
 	public WebDriver get() throws InterruptedException {
 		checkRunning();
 		WebDriver poll = innerQueue.poll();
+		ChromeDriver chromeDriver = null;
 		if (poll != null) {
-			return poll;
+			chromeDriver= (ChromeDriver)poll;
+
+			us.codecraft.webmagic.proxy.Proxy proxy = defaultProxyProvider.getProxy(null);
+			if(proxy!=null){
+//				String proxyIpAndPort = proxy.getHost()+":"+proxy.getPort();
+				String proxyIpAndPort = "33.33.33.33:33";
+				Proxy proxy2=new Proxy();
+//				proxy2.setHttpProxy(proxyIpAndPort);
+				proxy2.setSslProxy(proxyIpAndPort);
+//				proxy2.setHttpProxy(proxyIpAndPort).setFtpProxy(proxyIpAndPort).setSslProxy(proxyIpAndPort);
+				DesiredCapabilities cap = new DesiredCapabilities();
+				cap.setCapability(CapabilityType.PROXY,proxy2);
+				chromeDriver.getCapabilities().merge(cap);
+				logger.info("request proxy ip is "+proxyIpAndPort);
+			}
+
+			return chromeDriver;
 		}
 		if (webDriverList.size() < capacity) {
 			synchronized (webDriverList) {
@@ -57,6 +80,20 @@ class WebDriverPool {
 					ChromeOptions chromeOptions = new ChromeOptions();
 //					chromeOptions.addArguments("--headless");
 					chromeOptions.setHeadless(true);
+
+					us.codecraft.webmagic.proxy.Proxy proxy = defaultProxyProvider.getProxy(null);
+					if(proxy!=null){
+//						String proxyIpAndPort = proxy.getHost()+":"+proxy.getHost();
+						String proxyIpAndPort = "33.33.33.33:33";;
+						Proxy proxy2=new Proxy();
+						proxy2.setSslProxy(proxyIpAndPort);
+//						proxy2.setHttpProxy(proxyIpAndPort).
+//								setFtpProxy(proxyIpAndPort).setSslProxy(proxyIpAndPort);
+						chromeOptions.setProxy(proxy2);
+					}
+
+
+
 					ChromeDriver webDriver = new ChromeDriver(chromeOptions);
 
 
@@ -65,6 +102,7 @@ class WebDriverPool {
 				}
 			}
 		}
+
 		return innerQueue.take();
 	}
 

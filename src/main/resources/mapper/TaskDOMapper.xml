@@ -35,8 +35,10 @@
     from task
     where ID = #{id,jdbcType=INTEGER}
   </select>
+
   <select id="selectAll" resultMap="BaseResultMap" >
     select ID, TASK_NAME, SEED_URL, URL_TEMPLATE, PAGE_PARAMS, STATUS
     from task
+    WHERE STATUS="00"
   </select>
 </mapper>

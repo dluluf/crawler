@@ -68,7 +68,7 @@ public class SeleniumDownloader implements Downloader,Closeable{
                 jsExecutor.executeScript(js);
             }
 
-            Thread.sleep(1000);
+            Thread.sleep(3000);
             WebElement webElement = webDriver.findElement(By.xpath("/html"));
             String content = webElement.getAttribute("outerHTML");
             page.setRawText(content);

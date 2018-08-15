@@ -1,5 +1,9 @@
 package com.pinganfu.crawler.fetcher.proxy;
 
+import com.pinganfu.crawler.data.dao.ProxyIPDao;
+import com.pinganfu.crawler.data.model.ProxyIPDO;
+import com.pinganfu.crawler.util.SpringContextUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Task;
 import us.codecraft.webmagic.proxy.Proxy;
@@ -12,10 +16,18 @@ import java.util.Random;
 
 public class DefaultProxyProvider implements ProxyProvider{
 
-    private final List<Proxy> proxies;
+    private static List<Proxy> proxies = new ArrayList<>();
+
+    private ProxyIPDao proxyIPDao;
+
     public DefaultProxyProvider(){
-        //TODO 加载代理
-        proxies = new ArrayList<>();
+        proxyIPDao = (ProxyIPDao)SpringContextUtil.getBean("proxyIPDao");
+        List<ProxyIPDO> proxyIPDOS = proxyIPDao.selectAll();
+        for(ProxyIPDO proxyIPDO :proxyIPDOS){
+            Proxy proxy = new Proxy(proxyIPDO.getHost(),proxyIPDO.getPort());
+            proxies.add(proxy);
+        }
+
     }
 
     /**
@@ -46,11 +58,12 @@ public class DefaultProxyProvider implements ProxyProvider{
      */
     @Override
     public Proxy getProxy(Task task) {
-        if(proxies!=null && proxies.size()!=0){
-            Random random = new Random();
-            return proxies.get(random.nextInt(proxies.size()));
-        }
-        return null;
+//        if(proxies!=null && proxies.size()!=0){
+//            Random random = new Random();
+//            return proxies.get(random.nextInt(proxies.size()));
+//        }
+//        return null;
+        return  new Proxy("183.129.244.17",10010);
 
     }
 }
